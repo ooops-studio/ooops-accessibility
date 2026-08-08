@@ -1,0 +1,3 @@
+[
+	{ "name": "accessibility", "path": ["dist/index.js"], "limit": "14 KB" }
+]

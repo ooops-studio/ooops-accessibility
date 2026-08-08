@@ -1,0 +1,21 @@
+---
+import {createAccessibilityHeadScript} from '@ooopsstudio/accessibility'
+import {accessibilityGlobalStyles} from './index'
+import type {AccessibilityHeadProps} from './index'
+
+const {
+	enabled = true,
+	storageKey,
+	includeGlobalEffects = true,
+	defaults
+} = Astro.props as AccessibilityHeadProps
+
+const headScript = enabled ? createAccessibilityHeadScript({storageKey, defaults}) : ''
+---
+
+{enabled && (
+	<>
+		<script is:inline set:html={headScript} />
+		{includeGlobalEffects && <style is:global set:html={accessibilityGlobalStyles} />}
+	</>
+)}

@@ -1,0 +1,287 @@
+---
+import {
+	DEFAULT_ACCESSIBILITY_CONTROLS,
+	DEFAULT_ACCESSIBILITY_STORAGE_KEY
+} from '@ooopsstudio/accessibility'
+import {
+	accessibilityGlobalStyles,
+	accessibilityMenuStyles,
+	defaultAccessibilityLabels,
+	serializeInlineJson
+} from './index'
+import type {AccessibilityLabels, AccessibilityMenuProps} from './index'
+
+const {
+	enabled = true,
+	label,
+	position = 'bottom-right',
+	storageKey = DEFAULT_ACCESSIBILITY_STORAGE_KEY,
+	class: className = '',
+	panelId = 'ooops-accessibility-panel',
+	controls = DEFAULT_ACCESSIBILITY_CONTROLS,
+	labels,
+	includeBaseStyles = true,
+	includeGlobalEffects = true
+} = Astro.props as AccessibilityMenuProps
+
+const resolvedLabels: AccessibilityLabels = {
+	...defaultAccessibilityLabels,
+	...labels,
+	title: label ?? labels?.title ?? defaultAccessibilityLabels.title
+}
+
+const config = serializeInlineJson({
+	storageKey,
+	labels: resolvedLabels
+})
+---
+
+{enabled && (
+	<div
+		class:list={[
+			'ooops-a11y-widget',
+			`ooops-a11y-widget-${position}`,
+			className
+		]}
+		data-ooops-a11y-widget
+	>
+		<script type="application/json" data-ooops-a11y-config set:html={config} />
+		<button
+			type="button"
+			class="ooops-a11y-trigger"
+			aria-controls={panelId}
+			aria-expanded="false"
+			data-ooops-a11y-trigger
+		>
+			<span class="sr-only">{resolvedLabels.open}</span>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M12 3.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Zm-8.25 5.5a1 1 0 0 0 .22 1.98l5.03-.56v3.08l-2.75 7.08a1 1 0 1 0 1.86.74l2.28-5.72h3.22l2.28 5.72a1 1 0 1 0 1.86-.74L15 13.25v-3.08l5.03.56a1 1 0 1 0 .22-1.98L13.2 8h-2.4L3.75 8.75Z" />
+			</svg>
+		</button>
+		<div class="ooops-a11y-overlay" hidden data-ooops-a11y-overlay></div>
+		<section
+			id={panelId}
+			class="ooops-a11y-panel"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby={`${panelId}-title`}
+			hidden
+			data-ooops-a11y-panel
+		>
+			<header class="ooops-a11y-header">
+				<div>
+					<span class="ooops-a11y-eyebrow">{resolvedLabels.eyebrow}</span>
+					<h2 id={`${panelId}-title`}>{resolvedLabels.title}</h2>
+				</div>
+				<button type="button" class="ooops-a11y-close" data-ooops-a11y-close>
+					<span aria-hidden="true">×</span>
+					<span class="sr-only">{resolvedLabels.close}</span>
+				</button>
+			</header>
+			<div class="ooops-a11y-grid">
+				{controls.map((control) => (
+					control.type === 'range' ? (
+						<div class="ooops-a11y-card ooops-a11y-range" data-ooops-a11y-range={control.key}>
+							<strong>{control.label}</strong>
+							<div class="ooops-a11y-range-controls">
+								<button
+									type="button"
+									data-ooops-a11y-step={control.key}
+									data-direction="-1"
+									aria-label={`${resolvedLabels.decrease} ${control.label}`}
+								>
+									−
+								</button>
+								<span data-ooops-a11y-value={control.key}>100%</span>
+								<button
+									type="button"
+									data-ooops-a11y-step={control.key}
+									data-direction="1"
+									aria-label={`${resolvedLabels.increase} ${control.label}`}
+								>
+									+
+								</button>
+							</div>
+						</div>
+					) : (
+						<button
+							type="button"
+							class="ooops-a11y-card ooops-a11y-toggle"
+							aria-pressed="false"
+							data-ooops-a11y-toggle={control.key}
+						>
+							<span class="ooops-a11y-icon-wrap" aria-hidden="true">
+								{control.icon ?? control.label.slice(0, 1)}
+							</span>
+							<span>{control.label}</span>
+						</button>
+					)
+				))}
+			</div>
+			<button type="button" class="ooops-a11y-reset" data-ooops-a11y-reset>
+				{resolvedLabels.reset}
+			</button>
+		</section>
+	</div>
+)}
+
+{enabled && includeGlobalEffects && <style is:global set:html={accessibilityGlobalStyles} />}
+{enabled && includeBaseStyles && <style is:global set:html={accessibilityMenuStyles} />}
+
+<script>
+	import {createAccessibilityController, createFocusTrap} from '@ooopsstudio/accessibility'
+
+	const initializedWidgets = new WeakSet()
+	const widgetCleanups = new Map<HTMLElement, () => void>()
+
+	const readConfig = (widget) => {
+		const configNode = widget.querySelector('[data-ooops-a11y-config]')
+
+		if (!(configNode instanceof HTMLScriptElement)) {
+			return {}
+		}
+
+		try {
+			return JSON.parse(configNode.textContent || '{}')
+		} catch {
+			return {}
+		}
+	}
+
+	const syncWidget = (widget, preferences) => {
+		widget.querySelectorAll('[data-ooops-a11y-toggle]').forEach((button) => {
+			if (!(button instanceof HTMLButtonElement)) {
+				return
+			}
+
+			const key = button.dataset.ooopsA11yToggle
+			button.setAttribute('aria-pressed', String(Boolean(preferences[key])))
+		})
+
+		widget.querySelectorAll('[data-ooops-a11y-value]').forEach((node) => {
+			if (!(node instanceof HTMLElement)) {
+				return
+			}
+
+			const key = node.dataset.ooopsA11yValue
+			const value = preferences[key]
+			node.textContent = typeof value === 'number' ? `${value}%` : ''
+		})
+	}
+
+	const initWidget = (widget) => {
+		if (!(widget instanceof HTMLElement) || initializedWidgets.has(widget)) {
+			return
+		}
+
+		const trigger = widget.querySelector('[data-ooops-a11y-trigger]')
+		const panel = widget.querySelector('[data-ooops-a11y-panel]')
+		const overlay = widget.querySelector('[data-ooops-a11y-overlay]')
+		const closeButton = widget.querySelector('[data-ooops-a11y-close]')
+		const resetButton = widget.querySelector('[data-ooops-a11y-reset]')
+
+		if (!(trigger instanceof HTMLButtonElement) || !(panel instanceof HTMLElement)) {
+			return
+		}
+
+		const config = readConfig(widget)
+		const events = new AbortController()
+		const {signal} = events
+		const controller = createAccessibilityController({
+			storageKey: typeof config.storageKey === 'string' ? config.storageKey : undefined
+		})
+		const focusController = createFocusTrap({
+			getContainer: () => panel,
+			getRoot: () => widget,
+			getInitialFocus: () => closeButton instanceof HTMLElement ? closeButton : null,
+			getRestoreFocusTo: () => trigger,
+			modal: true,
+			onEscape: () => closePanel()
+		})
+
+		const openPanel = () => {
+			panel.hidden = false
+			if (overlay instanceof HTMLElement) {
+				overlay.hidden = false
+			}
+			trigger.setAttribute('aria-expanded', 'true')
+			focusController.activate()
+		}
+
+		const closePanel = () => {
+			focusController.deactivate()
+			panel.hidden = true
+			if (overlay instanceof HTMLElement) {
+				overlay.hidden = true
+			}
+			trigger.setAttribute('aria-expanded', 'false')
+		}
+
+		trigger.addEventListener('click', () => {
+			if (panel.hidden) {
+				openPanel()
+			} else {
+				closePanel()
+			}
+		}, {signal})
+
+		closeButton?.addEventListener('click', closePanel, {signal})
+		overlay?.addEventListener('click', closePanel, {signal})
+		resetButton?.addEventListener('click', () => controller.reset(), {signal})
+
+		widget.querySelectorAll('[data-ooops-a11y-toggle]').forEach((button) => {
+			button.addEventListener('click', () => {
+				if (!(button instanceof HTMLElement)) {
+					return
+				}
+
+				const key = button.dataset.ooopsA11yToggle
+				if (key) {
+					controller.toggle(key)
+				}
+			}, {signal})
+		})
+
+		widget.querySelectorAll('[data-ooops-a11y-step]').forEach((button) => {
+			button.addEventListener('click', () => {
+				if (!(button instanceof HTMLElement)) {
+					return
+				}
+
+				const key = button.dataset.ooopsA11yStep
+				const direction = button.dataset.direction === '-1' ? -1 : 1
+				if (key) {
+					controller.stepRange(key, direction)
+				}
+			}, {signal})
+		})
+
+		document.addEventListener('pointermove', (event) => {
+			if (controller.getPreferences().readingGuide) {
+				controller.updateReadingGuide(event.clientY)
+			}
+		}, {passive: true, signal})
+
+		const unsubscribe = controller.subscribe((preferences) => syncWidget(widget, preferences))
+		syncWidget(widget, controller.getPreferences())
+		initializedWidgets.add(widget)
+		widgetCleanups.set(widget, () => {
+			events.abort()
+			unsubscribe()
+			focusController.destroy()
+			controller.destroy()
+			initializedWidgets.delete(widget)
+			widgetCleanups.delete(widget)
+		})
+	}
+
+	const initAccessibilityWidgets = () => {
+		document.querySelectorAll('[data-ooops-a11y-widget]').forEach(initWidget)
+	}
+
+	initAccessibilityWidgets()
+	document.addEventListener('astro:page-load', initAccessibilityWidgets)
+	document.addEventListener('astro:before-swap', () => {
+		for (const cleanup of [...widgetCleanups.values()]) cleanup()
+	})
+</script>

@@ -1,0 +1,14 @@
+---
+import {defaultAccessibilityLabels, skipLinkStyles} from './index'
+import type {SkipLinkProps} from './index'
+
+const {
+	href = '#main-content',
+	label = defaultAccessibilityLabels.skip,
+	class: className = '',
+	includeBaseStyles = true
+} = Astro.props as SkipLinkProps
+---
+
+<a class:list={['ooops-skip-link', className]} href={href}>{label}</a>
+{includeBaseStyles && <style is:global set:html={skipLinkStyles} />}

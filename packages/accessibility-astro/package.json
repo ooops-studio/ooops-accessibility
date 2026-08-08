@@ -1,0 +1,78 @@
+{
+  "name": "@ooopsstudio/accessibility-astro",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Astro adapter components for @ooopsstudio/accessibility.",
+  "license": "MIT",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js"
+    },
+    "./AccessibilityHead.astro": {
+      "default": "./dist/AccessibilityHead.astro"
+    },
+    "./AccessibilityMenu.astro": {
+      "default": "./dist/AccessibilityMenu.astro"
+    },
+    "./SkipLink.astro": {
+      "default": "./dist/SkipLink.astro"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup && node ./scripts/copy-astro.mjs",
+    "test": "vitest run --config vitest.config.ts",
+    "pack:dry": "npm pack --dry-run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "size": "size-limit --config .size-limit.json",
+    "publint": "publint",
+    "attw": "attw --pack --ignore-rules no-resolution --ignore-rules cjs-resolves-to-esm",
+    "depcruise": "depcruise --config ../../.dependency-cruiser.cjs src"
+  },
+  "dependencies": {
+    "@ooopsstudio/accessibility": "workspace:^",
+    "@ooopsstudio/editor-contracts": "^0.1.0"
+  },
+  "peerDependencies": {
+    "astro": ">=7 <8"
+  },
+  "peerDependenciesMeta": {
+    "astro": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "astro": "7.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ooops-studio/ooops-accessibility.git",
+    "directory": "packages/accessibility-astro"
+  },
+  "homepage": "https://github.com/ooops-studio/ooops-accessibility/tree/main/packages/accessibility-astro#readme",
+  "bugs": {
+    "url": "https://github.com/ooops-studio/ooops-accessibility/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  }
+}

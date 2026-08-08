@@ -1,0 +1,50 @@
+{
+  "name": "@ooopsstudio/accessibility",
+  "description": "Framework-agnostic accessibility preference runtime for Ooops Studio sites.",
+  "version": "0.1.0",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ooops-studio/ooops-accessibility.git"
+  },
+  "homepage": "https://github.com/ooops-studio/ooops-accessibility",
+  "bugs": {
+    "url": "https://github.com/ooops-studio/ooops-accessibility/issues"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "import": "./dist/editor.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@ooopsstudio/editor-contracts": "^0.1.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "build": "tsup",
+    "pack:dry": "npm pack --dry-run",
+    "depcruise": "depcruise --config ../../.dependency-cruiser.cjs src",
+    "size": "size-limit --config .size-limit.json",
+    "publint": "publint",
+    "attw": "attw --pack --ignore-rules no-resolution --ignore-rules cjs-resolves-to-esm"
+  }
+}

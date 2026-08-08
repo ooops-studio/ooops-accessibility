@@ -1,0 +1,7 @@
+[
+  {
+    "name": "accessibility-astro",
+    "path": ["dist/index.js"],
+    "limit": "8 KB"
+  }
+]
