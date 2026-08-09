@@ -6,6 +6,6 @@ const distRoot = new URL('dist/', packageRoot)
 
 await mkdir(distRoot, {recursive: true})
 
-for (const fileName of ['AccessibilityHead.astro', 'AccessibilityMenu.astro', 'SkipLink.astro']) {
+for (const fileName of ['AccessibilityHead.astro', 'AccessibilityIcon.astro', 'AccessibilityMenu.astro', 'SkipLink.astro']) {
 	await copyFile(new URL(fileName, sourceRoot), new URL(fileName, distRoot))
 }

@@ -63,7 +63,72 @@ Range values are clamped from `80` to `200`.
   - `--ooops-a11y-letter-spacing`
   - `--ooops-a11y-reading-guide-y`
 
-Project CSS decides how those classes look. The Astro adapter includes generic effect styles.
+The package exports `accessibilityGlobalStyles`, `accessibilityMenuStyles`, and `skipLinkStyles` as the canonical CSS consumed by both adapters. This prevents framework-specific effect drift.
+
+### Menu layout tokens
+
+The default menu is intentionally opinionated, but its geometry is tokenized. Override these variables on the widget or any ancestor:
+
+- Placement: `--ooops-a11y-viewport-offset`, `--ooops-a11y-panel-gap`, `--ooops-a11y-panel-width`, `--ooops-a11y-panel-max-height`.
+- Panel: `--ooops-a11y-panel-padding`, `--ooops-a11y-panel-border-width`, `--ooops-a11y-panel-radius`, `--ooops-a11y-panel-shadow`.
+- Header/actions: `--ooops-a11y-header-gap`, `--ooops-a11y-header-padding`, `--ooops-a11y-header-action-gap`, `--ooops-a11y-close-size`, `--ooops-a11y-reset-min-height`.
+- Grid/cards: `--ooops-a11y-grid-columns`, `--ooops-a11y-grid-gap`, `--ooops-a11y-card-min-height`, `--ooops-a11y-card-padding`, `--ooops-a11y-card-radius`, `--ooops-a11y-card-border-width`.
+- Icons/ranges: `--ooops-a11y-trigger-size`, `--ooops-a11y-trigger-icon-size`, `--ooops-a11y-icon-wrap-size`, `--ooops-a11y-control-icon-size`, `--ooops-a11y-range-gap`, `--ooops-a11y-range-control-gap`, `--ooops-a11y-range-button-size`.
+
+`ACCESSIBILITY_MENU_PARTS` and `AccessibilityPartClasses` expose the canonical atomic part contract shared by Astro and Svelte.
+
+## Headless sidebar/settings page
+
+Use the controller directly when the UI should not be a floating modal. This example keeps the settings permanently visible in a sidebar and owns all markup and styling:
+
+```html
+<aside aria-labelledby="accessibility-settings-title">
+	<h2 id="accessibility-settings-title">Accessibility settings</h2>
+	<label>
+		<input id="high-contrast" type="checkbox" />
+		High contrast
+	</label>
+	<label for="font-scale">Font size</label>
+	<input id="font-scale" type="range" min="80" max="200" step="10" />
+	<output id="font-scale-value" for="font-scale"></output>
+	<button id="reset-accessibility" type="button">Reset</button>
+</aside>
+
+<script type="module">
+	import {createAccessibilityController} from '@ooopsstudio/accessibility'
+
+	const controller = createAccessibilityController()
+	const contrast = document.querySelector('#high-contrast')
+	const scale = document.querySelector('#font-scale')
+	const value = document.querySelector('#font-scale-value')
+
+	const render = (preferences) => {
+		contrast.checked = preferences.highContrast
+		scale.value = String(preferences.fontScale)
+		value.value = `${preferences.fontScale}%`
+	}
+
+	contrast.addEventListener('change', () => controller.setPreference('highContrast', contrast.checked))
+	scale.addEventListener('input', () => controller.setPreference('fontScale', Number(scale.value)))
+	document.querySelector('#reset-accessibility').addEventListener('click', () => controller.reset())
+	const unsubscribe = controller.subscribe(render)
+	render(controller.getPreferences())
+
+	// Call both when the owning page/component is destroyed.
+	window.addEventListener('pagehide', () => {
+		unsubscribe()
+		controller.destroy()
+	}, {once: true})
+</script>
+```
+
+The headless route is the correct choice for a sidebar, settings page, command palette, native-app panel, or any interaction that should not use the adapters' button/dialog shell.
+
+## Localization
+
+Built-in English and Greek copy is available through `getAccessibilityLabels('en' | 'el')` and `getAccessibilityControls('en' | 'el')`. Adapter-level `labels` and custom control definitions can override every string.
+
+Persistence is best-effort: blocked or quota-limited storage never prevents the active in-memory preference from being applied to the document.
 
 ## Editor metadata
 
@@ -74,15 +139,16 @@ Project CSS decides how those classes look. The Astro adapter includes generic e
 ```ts
 import {createModalFocusController} from '@ooopsstudio/accessibility'
 
-const modal = document.querySelector('[role="dialog"]')
-const focus = createModalFocusController(modal, {
-	returnFocus: true,
-	restoreInert: true,
+const modal = document.querySelector<HTMLElement>('[role="dialog"]')
+const trigger = document.querySelector<HTMLElement>('[aria-controls]')
+const focus = createModalFocusController({
+	getContainer: () => modal,
+	getRestoreFocusTo: () => trigger,
 	onEscape: () => closeModal()
 })
 
-focus.open()
-focus.close()
+focus.setOpen(true)
+focus.setOpen(false)
 ```
 
 The modal controller traps Tab/Shift+Tab, restores focus, and can temporarily set sibling elements to `inert`.

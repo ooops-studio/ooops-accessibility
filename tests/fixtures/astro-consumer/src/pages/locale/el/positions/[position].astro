@@ -1,0 +1,11 @@
+---
+import Layout from '../../../../layouts/AccessibilityLayout.astro'
+import type {AccessibilityPosition} from '@ooopsstudio/accessibility-astro'
+
+export const getStaticPaths = () =>
+	(['bottom-left', 'bottom-right', 'top-left', 'top-right', 'inline'] satisfies AccessibilityPosition[])
+		.map((position) => ({params: {position}}))
+const position = Astro.params.position as AccessibilityPosition
+---
+
+<Layout page={`position-${position}-el`} locale="el" {position} />

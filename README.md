@@ -85,6 +85,10 @@ The adapter is generic and override-friendly. It does not depend on Stage, appli
 
 The Svelte adapter uses the same core preference controller and focus trap as the other integrations.
 
+## Styling and custom layouts
+
+Both adapters share one atomic `AccessibilityPartClasses` contract and the same layout CSS variables. Use the default menu for a ready-made floating interface, set `includeBaseStyles={false}` with a complete Astro slot or Svelte snippet for an unstyled dialog, or use `createAccessibilityController()` directly for a permanent sidebar/settings page. The package READMEs include complete examples and the Astro behavior-attribute contract.
+
 See each package README for its complete API, styling hooks and development commands.
 
 ## Requirements
@@ -99,7 +103,7 @@ pnpm install
 pnpm -w validate
 ```
 
-The validation pipeline covers manifests, dependency policy, linting, types, builds, unit tests, size budgets, dependency boundaries, publish shape, packed consumer imports and package readiness.
+The validation pipeline covers manifests, dependency policy, linting, types, builds, unit tests, size budgets, dependency boundaries, publish shape and package readiness. It also packs all three public packages, installs them into real Astro and Svelte consumer applications, and runs the shared Playwright adapter contract, Axe checks and desktop/mobile visual captures.
 
 ## Releases
 

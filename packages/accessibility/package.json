@@ -1,7 +1,7 @@
 {
   "name": "@ooopsstudio/accessibility",
   "description": "Framework-agnostic accessibility preference runtime for Ooops Studio sites.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "publishConfig": {
     "access": "public"
@@ -31,7 +31,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "dependencies": {
     "@ooopsstudio/editor-contracts": "^0.1.0"

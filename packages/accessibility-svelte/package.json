@@ -1,6 +1,6 @@
 {
   "name": "@ooopsstudio/accessibility-svelte",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Svelte 5 components for @ooopsstudio/accessibility.",
@@ -17,6 +17,11 @@
       "types": "./dist/AccessibilityMenu.svelte.d.ts",
       "svelte": "./dist/AccessibilityMenu.svelte",
       "default": "./dist/AccessibilityMenu.svelte"
+    },
+    "./AccessibilityHead.svelte": {
+      "types": "./dist/AccessibilityHead.svelte.d.ts",
+      "svelte": "./dist/AccessibilityHead.svelte",
+      "default": "./dist/AccessibilityHead.svelte"
     },
     "./SkipLink.svelte": {
       "types": "./dist/SkipLink.svelte.d.ts",
@@ -41,7 +46,8 @@
     "depcruise": "pnpm -w exec dependency-cruise --config .dependency-cruiser.cjs packages/accessibility-svelte/src"
   },
   "dependencies": {
-    "@ooopsstudio/accessibility": "workspace:^"
+    "@ooopsstudio/accessibility": "workspace:^",
+    "@ooopsstudio/ui-svelte": "^0.1.1"
   },
   "peerDependencies": {
     "svelte": ">=5 <6"
@@ -54,7 +60,7 @@
     "svelte": "^5.56.4",
     "typescript": "5.9.3",
     "vite": "^7.3.6",
-    "vitest": "4.1.0"
+    "vitest": "^3.2.6"
   },
   "repository": {
     "type": "git",

@@ -1,14 +1,16 @@
 ---
-import {defaultAccessibilityLabels, skipLinkStyles} from './index'
+import {getAccessibilityLabels, skipLinkStyles} from './index'
 import type {SkipLinkProps} from './index'
 
 const {
 	href = '#main-content',
-	label = defaultAccessibilityLabels.skip,
+	label,
+	locale = 'en',
 	class: className = '',
 	includeBaseStyles = true
 } = Astro.props as SkipLinkProps
+const resolvedLabel = label ?? getAccessibilityLabels(locale).skip
 ---
 
-<a class:list={['ooops-skip-link', className]} href={href}>{label}</a>
+<a class:list={['ooops-skip-link', className]} href={href} lang={locale} data-part="root">{resolvedLabel}</a>
 {includeBaseStyles && <style is:global set:html={skipLinkStyles} />}

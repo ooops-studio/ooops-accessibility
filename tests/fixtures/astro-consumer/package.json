@@ -1,0 +1,13 @@
+{
+  "name": "accessibility-astro-packed-consumer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "astro build"
+  },
+  "dependencies": {
+    "@ooopsstudio/accessibility": "__CORE_TARBALL__",
+    "@ooopsstudio/accessibility-astro": "__ADAPTER_TARBALL__",
+    "astro": "7.2.0"
+  }
+}

@@ -9,7 +9,7 @@ await Promise.all(
 		.map((entry) => rm(new URL(entry, dist), {force: true}))
 )
 
-for (const component of ['AccessibilityMenu', 'SkipLink']) {
+for (const component of ['AccessibilityHead', 'AccessibilityMenu', 'SkipLink']) {
 	await copyFile(
 		new URL(`${component}.svelte.d.ts`, dist),
 		new URL(`${component}.d.svelte.ts`, dist)

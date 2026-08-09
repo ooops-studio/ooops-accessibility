@@ -1,12 +1,16 @@
 ---
 import {
-	DEFAULT_ACCESSIBILITY_CONTROLS,
-	DEFAULT_ACCESSIBILITY_STORAGE_KEY
+	ACCESSIBILITY_TRIGGER_ICON,
+	DEFAULT_ACCESSIBILITY_STORAGE_KEY,
+	getAccessibilityIconDefinition,
+	getAccessibilityControls,
+	getAccessibilityLabels
 } from '@ooopsstudio/accessibility'
+import Part from '@ooopsstudio/ui-astro/Part.astro'
+import AccessibilityIcon from './AccessibilityIcon.astro'
 import {
 	accessibilityGlobalStyles,
 	accessibilityMenuStyles,
-	defaultAccessibilityLabels,
 	serializeInlineJson
 } from './index'
 import type {AccessibilityLabels, AccessibilityMenuProps} from './index'
@@ -18,17 +22,22 @@ const {
 	storageKey = DEFAULT_ACCESSIBILITY_STORAGE_KEY,
 	class: className = '',
 	panelId = 'ooops-accessibility-panel',
-	controls = DEFAULT_ACCESSIBILITY_CONTROLS,
+	controls: suppliedControls,
+	locale = 'en',
 	labels,
+	classNames = {},
+	style,
 	includeBaseStyles = true,
 	includeGlobalEffects = true
 } = Astro.props as AccessibilityMenuProps
 
+const localizedLabels = getAccessibilityLabels(locale)
 const resolvedLabels: AccessibilityLabels = {
-	...defaultAccessibilityLabels,
+	...localizedLabels,
 	...labels,
-	title: label ?? labels?.title ?? defaultAccessibilityLabels.title
+	title: label ?? labels?.title ?? localizedLabels.title
 }
+const controls = suppliedControls ?? getAccessibilityControls(locale)
 
 const config = serializeInlineJson({
 	storageKey,
@@ -41,60 +50,83 @@ const config = serializeInlineJson({
 		class:list={[
 			'ooops-a11y-widget',
 			`ooops-a11y-widget-${position}`,
-			className
+			className,
+			classNames.widget
 		]}
+		style={style}
+		lang={locale}
 		data-ooops-a11y-widget
+		data-part="root"
 	>
 		<script type="application/json" data-ooops-a11y-config set:html={config} />
 		<button
 			type="button"
-			class="ooops-a11y-trigger"
+			class:list={['ooops-a11y-trigger', classNames.trigger]}
 			aria-controls={panelId}
 			aria-expanded="false"
 			data-ooops-a11y-trigger
+			data-part="trigger"
 		>
-			<span class="sr-only">{resolvedLabels.open}</span>
-			<svg viewBox="0 0 24 24" aria-hidden="true">
-				<path d="M12 3.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Zm-8.25 5.5a1 1 0 0 0 .22 1.98l5.03-.56v3.08l-2.75 7.08a1 1 0 1 0 1.86.74l2.28-5.72h3.22l2.28 5.72a1 1 0 1 0 1.86-.74L15 13.25v-3.08l5.03.56a1 1 0 1 0 .22-1.98L13.2 8h-2.4L3.75 8.75Z" />
-			</svg>
+			<span class:list={['sr-only', classNames.triggerLabel]} data-part="trigger-label">{resolvedLabels.open}</span>
+			<slot name="trigger">
+				<AccessibilityIcon
+					icon={ACCESSIBILITY_TRIGGER_ICON}
+					class={['ooops-a11y-trigger-icon', classNames.triggerIcon].filter(Boolean).join(' ')}
+					dataPart="trigger-icon"
+				/>
+			</slot>
 		</button>
-		<div class="ooops-a11y-overlay" hidden data-ooops-a11y-overlay></div>
+		<div class:list={['ooops-a11y-overlay', classNames.overlay]} hidden data-ooops-a11y-overlay data-part="overlay"></div>
 		<section
 			id={panelId}
-			class="ooops-a11y-panel"
+			class:list={['ooops-a11y-panel', classNames.panel]}
 			role="dialog"
 			aria-modal="true"
-			aria-labelledby={`${panelId}-title`}
+			aria-label={resolvedLabels.title}
 			hidden
 			data-ooops-a11y-panel
+			data-part="content"
 		>
-			<header class="ooops-a11y-header">
-				<div>
-					<span class="ooops-a11y-eyebrow">{resolvedLabels.eyebrow}</span>
-					<h2 id={`${panelId}-title`}>{resolvedLabels.title}</h2>
+			<slot name="menu">
+			<Part part="header" as="header" class={`ooops-a11y-header ${classNames.header ?? ''}`.trim()}>
+				<slot name="header">
+				<div class:list={['ooops-a11y-header-content', classNames.headerContent]} data-part="header-content">
+					<span class:list={['ooops-a11y-eyebrow', classNames.eyebrow]}>{resolvedLabels.eyebrow}</span>
+					<h2 id={`${panelId}-title`} class={classNames.title}>{resolvedLabels.title}</h2>
 				</div>
-				<button type="button" class="ooops-a11y-close" data-ooops-a11y-close>
-					<span aria-hidden="true">×</span>
-					<span class="sr-only">{resolvedLabels.close}</span>
-				</button>
-			</header>
-			<div class="ooops-a11y-grid">
+				</slot>
+				<div class:list={['ooops-a11y-header-actions', classNames.headerActions]} data-part="header-actions">
+					<button type="button" class:list={['ooops-a11y-reset', classNames.reset]} data-ooops-a11y-reset data-part="reset">
+						{resolvedLabels.reset}
+					</button>
+					<button type="button" class:list={['ooops-a11y-close', classNames.close]} data-ooops-a11y-close data-part="close">
+						<span class:list={['ooops-a11y-close-icon', classNames.closeIcon]} data-part="close-icon" aria-hidden="true">×</span>
+						<span class:list={['sr-only', classNames.closeLabel]} data-part="close-label">{resolvedLabels.close}</span>
+					</button>
+				</div>
+			</Part>
+			<slot name="before-controls" />
+			<Part part="items" class={`ooops-a11y-grid ${classNames.grid ?? ''}`.trim()}>
 				{controls.map((control) => (
 					control.type === 'range' ? (
-						<div class="ooops-a11y-card ooops-a11y-range" data-ooops-a11y-range={control.key}>
-							<strong>{control.label}</strong>
-							<div class="ooops-a11y-range-controls">
+						<Part part="item" class={`ooops-a11y-card ooops-a11y-range ${classNames.item ?? ''} ${classNames.card ?? ''} ${classNames.range ?? ''}`.trim()} data-ooops-a11y-range={control.key}>
+							<span class:list={['ooops-a11y-control-title', classNames.controlTitle]} data-part="control-title">{control.label}</span>
+							<div class:list={['ooops-a11y-range-controls', classNames.rangeControls]} data-part="range-controls">
 								<button
 									type="button"
+									class:list={['ooops-a11y-range-button', classNames.rangeButton]}
+									data-part="range-button"
 									data-ooops-a11y-step={control.key}
 									data-direction="-1"
 									aria-label={`${resolvedLabels.decrease} ${control.label}`}
 								>
 									−
 								</button>
-								<span data-ooops-a11y-value={control.key}>100%</span>
+								<span class:list={['ooops-a11y-value', classNames.value]} data-part="value" aria-live="polite" aria-atomic="true" data-ooops-a11y-value={control.key}>100%</span>
 								<button
 									type="button"
+									class:list={['ooops-a11y-range-button', classNames.rangeButton]}
+									data-part="range-button"
 									data-ooops-a11y-step={control.key}
 									data-direction="1"
 									aria-label={`${resolvedLabels.increase} ${control.label}`}
@@ -102,25 +134,25 @@ const config = serializeInlineJson({
 									+
 								</button>
 							</div>
-						</div>
+						</Part>
 					) : (
 						<button
 							type="button"
-							class="ooops-a11y-card ooops-a11y-toggle"
+							class:list={['ooops-a11y-card', 'ooops-a11y-toggle', classNames.item, classNames.card, classNames.toggle]}
 							aria-pressed="false"
 							data-ooops-a11y-toggle={control.key}
 						>
-							<span class="ooops-a11y-icon-wrap" aria-hidden="true">
-								{control.icon ?? control.label.slice(0, 1)}
+							<span class:list={['ooops-a11y-icon-wrap', classNames.iconWrap]} data-part="icon-wrap" aria-hidden="true">
+								{control.icon ?? <AccessibilityIcon icon={getAccessibilityIconDefinition(control.key)} class={['ooops-a11y-control-icon', classNames.controlIcon].filter(Boolean).join(' ')} dataPart="control-icon" />}
 							</span>
-							<span>{control.label}</span>
+							<span class:list={['ooops-a11y-toggle-label', classNames.toggleLabel]} data-part="toggle-label">{control.label}</span>
 						</button>
 					)
 				))}
-			</div>
-			<button type="button" class="ooops-a11y-reset" data-ooops-a11y-reset>
-				{resolvedLabels.reset}
-			</button>
+			</Part>
+			<slot name="after-controls" />
+			<slot name="footer" />
+			</slot>
 		</section>
 	</div>
 )}
@@ -129,7 +161,7 @@ const config = serializeInlineJson({
 {enabled && includeBaseStyles && <style is:global set:html={accessibilityMenuStyles} />}
 
 <script>
-	import {createAccessibilityController, createFocusTrap} from '@ooopsstudio/accessibility'
+	import {createAccessibilityController, createFocusTrap, fitAccessibilityPanelToViewport} from '@ooopsstudio/accessibility'
 
 	const initializedWidgets = new WeakSet()
 	const widgetCleanups = new Map<HTMLElement, () => void>()
@@ -201,6 +233,7 @@ const config = serializeInlineJson({
 
 		const openPanel = () => {
 			panel.hidden = false
+			fitAccessibilityPanelToViewport(panel)
 			if (overlay instanceof HTMLElement) {
 				overlay.hidden = false
 			}
@@ -228,6 +261,11 @@ const config = serializeInlineJson({
 		closeButton?.addEventListener('click', closePanel, {signal})
 		overlay?.addEventListener('click', closePanel, {signal})
 		resetButton?.addEventListener('click', () => controller.reset(), {signal})
+		window.addEventListener('resize', () => {
+			if (!panel.hidden) {
+				fitAccessibilityPanelToViewport(panel)
+			}
+		}, {signal})
 
 		widget.querySelectorAll('[data-ooops-a11y-toggle]').forEach((button) => {
 			button.addEventListener('click', () => {

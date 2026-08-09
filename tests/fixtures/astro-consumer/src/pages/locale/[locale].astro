@@ -1,0 +1,9 @@
+---
+import Layout from '../../layouts/AccessibilityLayout.astro'
+import type {AccessibilityLocale} from '@ooopsstudio/accessibility'
+
+export const getStaticPaths = () => ['en', 'el'].map((locale) => ({params: {locale}}))
+const locale = Astro.params.locale as AccessibilityLocale
+---
+
+<Layout page={`locale-${locale}`} {locale} />

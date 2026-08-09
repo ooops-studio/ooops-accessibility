@@ -4,14 +4,24 @@ import {accessibilityEditorManifest} from '../src/editor'
 import {
 	ACCESSIBILITY_RANGE_MAX,
 	ACCESSIBILITY_RANGE_MIN,
+	ACCESSIBILITY_MENU_PARTS,
+	ACCESSIBILITY_TOGGLE_ICONS,
+	ACCESSIBILITY_TRIGGER_ICON,
 	DEFAULT_ACCESSIBILITY_CONTROLS,
 	DEFAULT_ACCESSIBILITY_PREFERENCES,
 	DEFAULT_ACCESSIBILITY_STORAGE_KEY,
+	accessibilityGlobalStyles,
+	accessibilityMenuStyles,
 	applyAccessibilityPreferences,
+	clearAccessibilityPreferences,
 	createAccessibilityController,
 	createAccessibilityHeadScript,
 	createFocusTrap,
 	createModalFocusController,
+	fitAccessibilityPanelToViewport,
+	getAccessibilityControls,
+	getAccessibilityIconDefinition,
+	getAccessibilityLabels,
 	loadAccessibilityPreferences,
 	resetAccessibilityPreferences,
 	saveAccessibilityPreferences,
@@ -96,6 +106,83 @@ describe('accessibility preferences', () => {
 		expect(window.localStorage.getItem(storageKey)).toBeNull()
 	})
 
+	it('keeps controls effective when storage writes and removals are blocked', () => {
+		const blockedStorage = {
+			getItem: () => null,
+			setItem: () => { throw new DOMException('Blocked', 'SecurityError') },
+			removeItem: () => { throw new DOMException('Blocked', 'SecurityError') }
+		}
+
+		expect(() => saveAccessibilityPreferences({highContrast: true}, {storage: blockedStorage})).not.toThrow()
+		expect(() => resetAccessibilityPreferences({storage: blockedStorage})).not.toThrow()
+
+		const controller = createAccessibilityController({storage: blockedStorage})
+		expect(() => controller.toggle('highContrast')).not.toThrow()
+		expect(controller.getPreferences().highContrast).toBe(true)
+		expect(document.documentElement.classList.contains('ooops-a11y-high-contrast')).toBe(true)
+		expect(() => controller.reset()).not.toThrow()
+		expect(controller.getPreferences()).toEqual(DEFAULT_ACCESSIBILITY_PREFERENCES)
+		expect(document.documentElement.classList.contains('ooops-a11y-high-contrast')).toBe(false)
+	})
+
+	it('ships Greek localization and canonical adapter styles', () => {
+		expect(getAccessibilityLabels('el')).toMatchObject({
+			title: 'Προσβασιμότητα',
+			reset: 'Επαναφορά'
+		})
+		expect(getAccessibilityControls('el').find((control) => control.key === 'highContrast')?.label)
+			.toBe('Υψηλή αντίθεση')
+		expect(accessibilityGlobalStyles).toContain('mix-blend-mode: saturation')
+		expect(accessibilityGlobalStyles).toContain('width=\'48\'')
+		expect(accessibilityMenuStyles).toContain('ooops-a11y-widget-inline')
+		expect(accessibilityMenuStyles).toContain('ooops-a11y-widget-top-right')
+		expect(accessibilityMenuStyles).toContain('box-sizing: border-box')
+		expect(accessibilityMenuStyles).toContain('--ooops-a11y-control-title-line-height, 1.2')
+		expect(accessibilityMenuStyles).toContain('--ooops-a11y-control-title-font-weight, 400')
+		expect(accessibilityMenuStyles).toContain('--ooops-a11y-grid-columns: 3')
+		expect(accessibilityMenuStyles).toContain('--ooops-a11y-card-min-height: 92px')
+		expect(ACCESSIBILITY_MENU_PARTS).toContain('triggerIcon')
+		expect(ACCESSIBILITY_MENU_PARTS).toContain('controlTitle')
+		expect(ACCESSIBILITY_MENU_PARTS).toContain('rangeButton')
+		expect(ACCESSIBILITY_MENU_PARTS).toContain('toggleLabel')
+	})
+
+	it('ships the canonical Ooops Suite accessibility icon set', () => {
+		expect(ACCESSIBILITY_TRIGGER_ICON.viewBox).toBe('0 0 30 30')
+		expect(Object.keys(ACCESSIBILITY_TOGGLE_ICONS)).toEqual([
+			'highContrast',
+			'monochrome',
+			'highlightTitles',
+			'highlightLinks',
+			'largeCursor',
+			'readingGuide',
+			'focusHighlight',
+			'pauseAnimations',
+			'hideMedia'
+		])
+		expect(getAccessibilityIconDefinition('highContrast').paths[0]?.d).toContain('M12 21.9971')
+		expect(getAccessibilityIconDefinition('focusHighlight').circles).toHaveLength(1)
+	})
+
+	it('fits an open panel to the remaining viewport height', () => {
+		const panel = document.createElement('section')
+		vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(900)
+		vi.spyOn(panel, 'getBoundingClientRect').mockReturnValue({
+			top: 185,
+			bottom: 905,
+			left: 0,
+			right: 544,
+			width: 544,
+			height: 720,
+			x: 0,
+			y: 185,
+			toJSON: () => ({})
+		})
+
+		expect(fitAccessibilityPanelToViewport(panel)).toBe(695)
+		expect(panel.style.getPropertyValue('--ooops-a11y-panel-max-height')).toBe('695px')
+	})
+
 	it('applies root classes and CSS variables', () => {
 		applyAccessibilityPreferences(document.documentElement, {
 			highContrast: true,
@@ -113,6 +200,23 @@ describe('accessibility preferences', () => {
 		expect(document.documentElement.style.getPropertyValue('--ooops-a11y-line-height-factor')).toBe('1.2')
 		expect(document.documentElement.style.getPropertyValue('--ooops-a11y-letter-spacing')).toBe('0.060em')
 		expect(document.documentElement.style.getPropertyValue('--ooops-a11y-reading-guide-y')).toBeTruthy()
+	})
+
+	it('clears active DOM effects without deleting persisted preferences', () => {
+		window.localStorage.setItem(storageKey, JSON.stringify({highContrast: true}))
+		applyAccessibilityPreferences(document.documentElement, {
+			highContrast: true,
+			fontScale: 140,
+			readingGuide: true
+		})
+
+		clearAccessibilityPreferences(document.documentElement)
+
+		expect(document.documentElement.classList.contains('ooops-a11y-ready')).toBe(false)
+		expect(document.documentElement.classList.contains('ooops-a11y-high-contrast')).toBe(false)
+		expect(document.documentElement.style.getPropertyValue('--ooops-a11y-font-scale')).toBe('')
+		expect(document.documentElement.style.getPropertyValue('--ooops-a11y-reading-guide-y')).toBe('')
+		expect(window.localStorage.getItem(storageKey)).not.toBeNull()
 	})
 
 	it('creates a controller that toggles, steps and persists', () => {

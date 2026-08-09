@@ -1,7 +1,7 @@
 {
 	"name": "@ooopsstudio/ooops-accessibility",
 	"version": "0.0.0",
-  "description": "Framework-neutral accessibility preferences and focus utilities with an Astro adapter.",
+  "description": "Framework-neutral accessibility preferences and focus utilities with Astro and Svelte adapters.",
 	"private": true,
 	"type": "module",
 	"license": "MIT",
@@ -15,8 +15,11 @@
 	},
 	"scripts": {
 		"typecheck": "pnpm --filter @ooopsstudio/accessibility build && pnpm -r --filter './packages/*' run typecheck",
-		"lint": "eslint --cache --cache-strategy content --cache-location .cache/eslint --no-error-on-unmatched-pattern .dependency-cruiser.cjs commitlint.config.mjs eslint.config.js vitest.config.ts \"scripts/**/*.{js,mjs,cjs,ts,tsx}\" \"examples/**/*.{js,mjs,cjs,ts,tsx}\" \"packages/*/*.{js,mjs,cjs,ts,tsx}\" \"packages/*/{src,test}/**/*.{js,mjs,cjs,ts,tsx}\"",
+		"lint": "eslint --cache --cache-strategy content --cache-location .cache/eslint --no-error-on-unmatched-pattern .dependency-cruiser.cjs commitlint.config.mjs eslint.config.js playwright.config.ts vitest.config.ts \"scripts/**/*.{js,mjs,cjs,ts,tsx}\" \"tests/**/*.{js,mjs,cjs,ts,tsx}\" \"examples/**/*.{js,mjs,cjs,ts,tsx}\" \"packages/*/*.{js,mjs,cjs,ts,tsx}\" \"packages/*/{src,test}/**/*.{js,mjs,cjs,ts,tsx}\"",
 		"test": "pnpm -r --filter './packages/*' --if-present run test",
+		"test:e2e:prepare": "node ./scripts/prepare-e2e-consumers.mjs",
+		"test:e2e": "pnpm test:e2e:prepare && playwright test",
+		"test:e2e:update-snapshots": "pnpm test:e2e:prepare && playwright test --update-snapshots",
 		"build": "pnpm -r --filter './packages/*' run build",
 		"bootstrap": "node ./scripts/setup-template.mjs",
 		"init:template": "node ./scripts/init-template.mjs",
@@ -45,15 +48,17 @@
 		"release:preflight": "node ./scripts/release-preflight.mjs",
 		"publish:packages": "node ./scripts/publish-packages.mjs",
 		"changeset": "changeset",
-		"validate": "pnpm guard:template && pnpm check:agents && pnpm check:manifests && pnpm check:optional-modules && pnpm check:licenses && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm size && pnpm depcruise && pnpm publint && pnpm attw && pnpm check:packed-artifacts && pnpm readiness:strict && pnpm smoke:package-tools"
+		"validate": "pnpm guard:template && pnpm check:agents && pnpm check:manifests && pnpm check:optional-modules && pnpm check:licenses && pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm size && pnpm depcruise && pnpm publint && pnpm attw && pnpm check:packed-artifacts && pnpm test:e2e && pnpm readiness:strict && pnpm smoke:package-tools"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.2",
 		"@changesets/changelog-github": "^0.5.1",
 		"@changesets/cli": "^2.28.0",
+		"@axe-core/playwright": "^4.12.1",
 		"@commitlint/cli": "^20.1.0",
 		"@commitlint/config-conventional": "^20.0.0",
 		"@eslint/js": "^9.39.1",
+		"@playwright/test": "^1.62.1",
 		"@size-limit/preset-small-lib": "^11.2.0",
 		"@stylistic/eslint-plugin": "^5.4.0",
 		"@types/node": "^22.20.1",

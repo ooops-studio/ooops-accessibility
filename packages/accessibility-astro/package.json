@@ -1,6 +1,6 @@
 {
   "name": "@ooopsstudio/accessibility-astro",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "Astro adapter components for @ooopsstudio/accessibility.",
@@ -29,14 +29,15 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "sideEffects": false,
   "scripts": {
     "build": "tsup && node ./scripts/copy-astro.mjs",
     "test": "vitest run --config vitest.config.ts",
     "pack:dry": "npm pack --dry-run",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "astro check",
     "size": "size-limit --config .size-limit.json",
     "publint": "publint",
     "attw": "attw --pack --ignore-rules no-resolution --ignore-rules cjs-resolves-to-esm",
@@ -44,7 +45,8 @@
   },
   "dependencies": {
     "@ooopsstudio/accessibility": "workspace:^",
-    "@ooopsstudio/editor-contracts": "^0.1.0"
+    "@ooopsstudio/editor-contracts": "^0.1.0",
+    "@ooopsstudio/ui-astro": "^0.1.0"
   },
   "peerDependencies": {
     "astro": ">=7 <8"
@@ -55,6 +57,7 @@
     }
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.4",
     "astro": "7.2.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",

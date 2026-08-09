@@ -9,7 +9,8 @@
 		"MIT-0",
 		"0BSD",
 		"BlueOak-1.0.0",
-		"CC0-1.0"
+		"CC0-1.0",
+		"MPL-2.0"
 	],
 	"packageExceptions": {
 		"@andrewbranch/untar.js": true,

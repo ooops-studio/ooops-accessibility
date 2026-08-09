@@ -4,6 +4,7 @@ node_modules/
 
 # Build outputs
 dist/
+.astro/
 .svelte-kit/
 build/
 coverage/
@@ -49,5 +50,6 @@ temp/
 
 # Test reports (CI)
 reports/
+test-results/
 junit-report.xml
 *.lcov

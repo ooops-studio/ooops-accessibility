@@ -1,29 +1,16 @@
-export type AccessibilityPreferenceKey =
-	| 'highContrast'
-	| 'monochrome'
-	| 'highlightTitles'
-	| 'highlightLinks'
-	| 'pauseAnimations'
-	| 'hideMedia'
-	| 'largeCursor'
-	| 'readingGuide'
-	| 'focusHighlight'
-	| 'fontScale'
-	| 'lineHeight'
-	| 'letterSpacing'
-
-export type AccessibilityToggleKey = Exclude<
+import type {
 	AccessibilityPreferenceKey,
-	'fontScale' | 'lineHeight' | 'letterSpacing'
->
+	AccessibilityPreferences,
+	AccessibilityRangeKey,
+	AccessibilityToggleKey
+} from './types.js'
 
-export type AccessibilityRangeKey = Extract<
+export type {
 	AccessibilityPreferenceKey,
-	'fontScale' | 'lineHeight' | 'letterSpacing'
->
-
-export type AccessibilityPreferences = Record<AccessibilityToggleKey, boolean> &
-	Record<AccessibilityRangeKey, number>
+	AccessibilityPreferences,
+	AccessibilityRangeKey,
+	AccessibilityToggleKey
+} from './types.js'
 
 export type AccessibilityControlDefinition =
 	| {
@@ -37,6 +24,52 @@ export type AccessibilityControlDefinition =
 		key: AccessibilityRangeKey
 		label: string
 	}
+
+export type AccessibilityLocale = 'en' | 'el'
+
+export type AccessibilityLabels = {
+	open: string
+	close: string
+	title: string
+	eyebrow: string
+	reset: string
+	increase: string
+	decrease: string
+	skip: string
+}
+
+export const ACCESSIBILITY_MENU_PARTS = [
+	'widget',
+	'trigger',
+	'triggerLabel',
+	'triggerIcon',
+	'overlay',
+	'panel',
+	'header',
+	'headerContent',
+	'headerActions',
+	'eyebrow',
+	'title',
+	'reset',
+	'close',
+	'closeIcon',
+	'closeLabel',
+	'grid',
+	'item',
+	'card',
+	'toggle',
+	'iconWrap',
+	'controlIcon',
+	'toggleLabel',
+	'range',
+	'controlTitle',
+	'rangeControls',
+	'rangeButton',
+	'value'
+] as const
+
+export type AccessibilityMenuPart = typeof ACCESSIBILITY_MENU_PARTS[number]
+export type AccessibilityPartClasses = Partial<Record<AccessibilityMenuPart, string>>
 
 export type AccessibilityStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 
@@ -63,9 +96,39 @@ export type AccessibilityController = {
 	destroy: () => void
 }
 
+export {
+	accessibilityGlobalStyles,
+	accessibilityMenuStyles,
+	skipLinkStyles
+} from './styles.js'
+export {
+	ACCESSIBILITY_TOGGLE_ICONS,
+	ACCESSIBILITY_TRIGGER_ICON,
+	getAccessibilityIconDefinition
+} from './icons.js'
+export type {
+	AccessibilityIconCircle,
+	AccessibilityIconDefinition,
+	AccessibilityIconPath
+} from './icons.js'
+
 export type ApplyAccessibilityPreferencesOptions = {
 	classPrefix?: string
 	readyClass?: string
+}
+
+export const fitAccessibilityPanelToViewport = (
+	panel: HTMLElement,
+	margin = 20
+): number | null => {
+	if (typeof window === 'undefined') {
+		return null
+	}
+
+	const top = Math.max(0, panel.getBoundingClientRect().top)
+	const availableHeight = Math.max(240, Math.floor(window.innerHeight - top - margin))
+	panel.style.setProperty('--ooops-a11y-panel-max-height', `${availableHeight}px`)
+	return availableHeight
 }
 
 export type AccessibilityHeadScriptOptions = ApplyAccessibilityPreferencesOptions & {
@@ -108,6 +171,57 @@ export const DEFAULT_ACCESSIBILITY_CONTROLS: AccessibilityControlDefinition[] = 
 	{type: 'toggle', key: 'pauseAnimations', label: 'Reduce motion'},
 	{type: 'toggle', key: 'hideMedia', label: 'Hide media'}
 ]
+
+export const ACCESSIBILITY_LABELS: Record<AccessibilityLocale, AccessibilityLabels> = {
+	en: {
+		open: 'Open accessibility menu',
+		close: 'Close accessibility menu',
+		title: 'Accessibility',
+		eyebrow: 'Display tools',
+		reset: 'Reset',
+		increase: 'Increase',
+		decrease: 'Decrease',
+		skip: 'Skip to content'
+	},
+	el: {
+		open: 'Άνοιγμα μενού προσβασιμότητας',
+		close: 'Κλείσιμο μενού προσβασιμότητας',
+		title: 'Προσβασιμότητα',
+		eyebrow: 'Εργαλεία προβολής',
+		reset: 'Επαναφορά',
+		increase: 'Αύξηση',
+		decrease: 'Μείωση',
+		skip: 'Μετάβαση στο περιεχόμενο'
+	}
+}
+
+const greekControlLabels: Record<AccessibilityPreferenceKey, string> = {
+	fontScale: 'Μέγεθος γραμματοσειράς',
+	lineHeight: 'Ύψος γραμμής',
+	letterSpacing: 'Απόσταση γραμμάτων',
+	highContrast: 'Υψηλή αντίθεση',
+	monochrome: 'Μονόχρωμη προβολή',
+	highlightTitles: 'Επισήμανση τίτλων',
+	highlightLinks: 'Επισήμανση συνδέσμων',
+	pauseAnimations: 'Μείωση κίνησης',
+	hideMedia: 'Απόκρυψη πολυμέσων',
+	largeCursor: 'Μεγάλος δείκτης',
+	readingGuide: 'Οδηγός ανάγνωσης',
+	focusHighlight: 'Επισήμανση εστίασης'
+}
+
+export const getAccessibilityLabels = (
+	locale: AccessibilityLocale = 'en',
+	overrides: Partial<AccessibilityLabels> = {}
+): AccessibilityLabels => ({...(ACCESSIBILITY_LABELS[locale] ?? ACCESSIBILITY_LABELS.en), ...overrides})
+
+export const getAccessibilityControls = (
+	locale: AccessibilityLocale = 'en'
+): AccessibilityControlDefinition[] =>
+	DEFAULT_ACCESSIBILITY_CONTROLS.map((control) => ({
+		...control,
+		label: locale === 'el' ? greekControlLabels[control.key] : control.label
+	}))
 
 const toggleKeys: AccessibilityToggleKey[] = [
 	'highContrast',
@@ -159,7 +273,11 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const getDefaultStorage = () => {
 	if (typeof window === 'undefined') return null
-	return window.localStorage ?? null
+	try {
+		return window.localStorage ?? null
+	} catch {
+		return null
+	}
 }
 
 const normalizePreferences = (input: Partial<AccessibilityPreferences> = {}): AccessibilityPreferences => {
@@ -202,7 +320,11 @@ export const saveAccessibilityPreferences = (
 	const next = normalizePreferences(preferences)
 
 	if (storage) {
-		storage.setItem(options.storageKey ?? DEFAULT_ACCESSIBILITY_STORAGE_KEY, JSON.stringify(next))
+		try {
+			storage.setItem(options.storageKey ?? DEFAULT_ACCESSIBILITY_STORAGE_KEY, JSON.stringify(next))
+		} catch {
+			// Storage is best-effort. The active in-memory/DOM preference must still apply.
+		}
 	}
 
 	return next
@@ -215,10 +337,14 @@ export const resetAccessibilityPreferences = (
 	const storageKey = options.storageKey ?? DEFAULT_ACCESSIBILITY_STORAGE_KEY
 
 	if (storage) {
-		if (options.persistDefaults) {
-			storage.setItem(storageKey, JSON.stringify(DEFAULT_ACCESSIBILITY_PREFERENCES))
-		} else {
-			storage.removeItem(storageKey)
+		try {
+			if (options.persistDefaults) {
+				storage.setItem(storageKey, JSON.stringify(DEFAULT_ACCESSIBILITY_PREFERENCES))
+			} else {
+				storage.removeItem(storageKey)
+			}
+		} catch {
+			// Reset remains effective for the current document when persistence is blocked.
 		}
 	}
 
@@ -253,6 +379,23 @@ export const applyAccessibilityPreferences = (
 	}
 
 	return next
+}
+
+export const clearAccessibilityPreferences = (
+	root: HTMLElement,
+	options: ApplyAccessibilityPreferencesOptions = {}
+) => {
+	const classPrefix = options.classPrefix ?? 'ooops-a11y'
+	const readyClass = options.readyClass ?? `${classPrefix}-ready`
+
+	root.classList.remove(readyClass)
+	for (const key of toggleKeys) {
+		root.classList.remove(`${classPrefix}-${classSuffixByToggle[key]}`)
+	}
+	for (const variable of Object.values(cssVarByRange)) {
+		root.style.removeProperty(variable)
+	}
+	root.style.removeProperty('--ooops-a11y-reading-guide-y')
 }
 
 export const createAccessibilityHeadScript = (options: AccessibilityHeadScriptOptions = {}) => {

@@ -1,0 +1,36 @@
+---
+import type {AccessibilityIconDefinition} from '@ooopsstudio/accessibility'
+
+const {icon, class: className, dataPart} = Astro.props as {
+	icon: AccessibilityIconDefinition
+	class?: string
+	dataPart?: string
+}
+---
+
+<svg class={className} data-part={dataPart} viewBox={icon.viewBox} aria-hidden="true" focusable="false">
+	{icon.paths.map((path) => (
+		<path
+			d={path.d}
+			fill={path.fill}
+			fill-rule={path.fillRule}
+			clip-rule={path.clipRule}
+			stroke={path.stroke}
+			stroke-width={path.strokeWidth}
+			stroke-linecap={path.strokeLinecap}
+			stroke-linejoin={path.strokeLinejoin}
+			opacity={path.opacity}
+		/>
+	))}
+	{icon.circles?.map((circle) => (
+		<circle
+			cx={circle.cx}
+			cy={circle.cy}
+			r={circle.r}
+			fill={circle.fill}
+			stroke={circle.stroke}
+			stroke-width={circle.strokeWidth}
+			opacity={circle.opacity}
+		/>
+	))}
+</svg>
