@@ -1,5 +1,11 @@
 # @ooopsstudio/accessibility
 
+## 0.3.0
+
+### Minor Changes
+
+- [`5baba77`](https://github.com/ooops-studio/ooops-accessibility/commit/5baba77c997aecbecdeb9cefb001390777f291e5) Thanks [@italiour](https://github.com/italiour)! - Move visual-editor metadata into the optional `@ooopsstudio/accessibility-editor-manifests` package so runtime consumers no longer depend on editor contracts.
+
 ## 0.2.0
 
 ### Minor Changes

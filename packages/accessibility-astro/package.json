@@ -1,6 +1,6 @@
 {
   "name": "@ooopsstudio/accessibility-astro",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": false,
   "type": "module",
   "description": "Astro adapter components for @ooopsstudio/accessibility.",

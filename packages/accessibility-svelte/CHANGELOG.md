@@ -1,5 +1,12 @@
 # @ooopsstudio/accessibility-svelte
 
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies [[`5baba77`](https://github.com/ooops-studio/ooops-accessibility/commit/5baba77c997aecbecdeb9cefb001390777f291e5)]:
+  - @ooopsstudio/accessibility@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
