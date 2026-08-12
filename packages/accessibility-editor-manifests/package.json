@@ -1,25 +1,44 @@
 {
   "name": "@ooopsstudio/accessibility-editor-manifests",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Optional Ooops Editor manifests for accessibility preferences and Astro components.",
   "type": "module",
-  "publishConfig": {"access": "public"},
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": false,
   "license": "MIT",
-  "engines": {"node": ">=22.14.0"},
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ooops-studio/ooops-accessibility.git",
     "directory": "packages/accessibility-editor-manifests"
   },
   "homepage": "https://github.com/ooops-studio/ooops-accessibility/tree/main/packages/accessibility-editor-manifests#readme",
-  "bugs": {"url": "https://github.com/ooops-studio/ooops-accessibility/issues"},
-  "exports": {
-    ".": {"types": "./dist/index.d.ts", "import": "./dist/index.js"},
-    "./components": {"types": "./dist/components.d.ts", "import": "./dist/components.js"},
-    "./preferences": {"types": "./dist/preferences.d.ts", "import": "./dist/preferences.js"}
+  "bugs": {
+    "url": "https://github.com/ooops-studio/ooops-accessibility/issues"
   },
-  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js"
+    },
+    "./preferences": {
+      "types": "./dist/preferences.d.ts",
+      "import": "./dist/preferences.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "dependencies": {
     "@ooopsstudio/accessibility": "workspace:^",
     "@ooopsstudio/editor-contracts": "^0.3.0"
