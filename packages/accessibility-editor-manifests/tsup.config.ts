@@ -1,7 +1,7 @@
 import {defineConfig} from 'tsup'
 
 export default defineConfig({
-	entry: {'index': 'src/index.ts'},
+	entry: {index: 'src/index.ts', components: 'src/components.ts', preferences: 'src/preferences.ts'},
 	format: ['esm'],
 	platform: 'neutral',
 	target: 'node22',
@@ -10,5 +10,5 @@ export default defineConfig({
 	clean: true,
 	splitting: false,
 	treeshake: true,
-	minify: false
+	external: ['@ooopsstudio/accessibility', '@ooopsstudio/editor-contracts']
 })

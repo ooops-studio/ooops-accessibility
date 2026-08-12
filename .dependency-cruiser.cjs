@@ -21,23 +21,28 @@ module.exports = {
 			from: {path: '^packages/.*/src/'},
 			to:   {path: '^packages/.*/(test|__tests__|testing)/'}
 		},
+		{name: 'runtime-accessibility-does-not-depend-on-editor-contracts', severity: 'error',
+			from: {path: '^packages/(?:accessibility|accessibility-astro|accessibility-svelte)/src/'},
+			to: {path: 'editor-contracts'}
+		},
 
 		// Don’t import another package’s internals (only published exports).
 		// Keep the package pairs explicit so imports within one package remain legal.
 		{name: 'no-cross-internals-from-core', severity: 'error',
-			from: {
-				path: '^packages/accessibility/src/',
-				pathNot: '^packages/accessibility/src/editor\\.ts$'
-			},
-			to: {path: '^packages/accessibility-(?:astro|svelte)/src/'}
+			from: {path: '^packages/accessibility/src/'},
+			to: {path: '^packages/accessibility-(?:astro|svelte|editor-manifests)/src/'}
 		},
 		{name: 'no-cross-internals-from-astro', severity: 'error',
 			from: {path: '^packages/accessibility-astro/src/'},
-			to: {path: '^packages/(?:accessibility|accessibility-svelte)/src/'}
+			to: {path: '^packages/(?:accessibility|accessibility-svelte|accessibility-editor-manifests)/src/'}
 		},
 		{name: 'no-cross-internals-from-svelte', severity: 'error',
 			from: {path: '^packages/accessibility-svelte/src/'},
-			to: {path: '^packages/(?:accessibility|accessibility-astro)/src/'}
+			to: {path: '^packages/(?:accessibility|accessibility-astro|accessibility-editor-manifests)/src/'}
+		},
+		{name: 'no-cross-internals-from-editor-manifests', severity: 'error',
+			from: {path: '^packages/accessibility-editor-manifests/src/'},
+			to: {path: '^packages/(?:accessibility|accessibility-astro|accessibility-svelte)/src/'}
 		},
 
 		// Production code must not depend on devDeps

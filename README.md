@@ -8,9 +8,10 @@ These packages help projects provide user-controlled presentation and interactio
 
 | Package | Purpose |
 | --- | --- |
-| [`@ooopsstudio/accessibility`](packages/accessibility) | Headless preference controller, persistence, DOM effects, focus helpers, reduced-motion utilities and editor metadata. |
+| [`@ooopsstudio/accessibility`](packages/accessibility) | Headless preference controller, persistence, DOM effects, focus helpers and reduced-motion utilities. |
 | [`@ooopsstudio/accessibility-astro`](packages/accessibility-astro) | Themeable Astro components for no-flash initialization, the accessibility menu and a skip link. |
 | [`@ooopsstudio/accessibility-svelte`](packages/accessibility-svelte) | Themeable Svelte components for the accessibility menu and skip link. |
+| [`@ooopsstudio/accessibility-editor-manifests`](packages/accessibility-editor-manifests) | Optional editor manifests for accessibility preferences and Astro components. |
 
 All packages are public on npm under the [`@ooopsstudio`](https://www.npmjs.com/org/ooopsstudio) scope.
 

@@ -130,9 +130,9 @@ Built-in English and Greek copy is available through `getAccessibilityLabels('en
 
 Persistence is best-effort: blocked or quota-limited storage never prevents the active in-memory preference from being applied to the document.
 
-## Editor metadata
+## Optional editor metadata
 
-`@ooopsstudio/accessibility/editor` exports the versioned preference manifest used by visual tooling. It is generated from the same defaults, controls, classes and CSS variables as the runtime.
+Install `@ooopsstudio/accessibility-editor-manifests` when these preferences need to be exposed to Ooops Editor. The headless runtime itself has no editor-contract dependency.
 
 ## Focus Helpers
 

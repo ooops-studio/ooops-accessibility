@@ -11,7 +11,7 @@ import {
 	DEFAULT_ACCESSIBILITY_CONTROLS,
 	DEFAULT_ACCESSIBILITY_PREFERENCES,
 	DEFAULT_ACCESSIBILITY_STORAGE_KEY
-} from './index'
+} from '@ooopsstudio/accessibility'
 
 const classNames: Partial<Record<keyof typeof DEFAULT_ACCESSIBILITY_PREFERENCES, string>> = {
 	highContrast: 'ooops-a11y-high-contrast',

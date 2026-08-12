@@ -1,4 +1,4 @@
-import {accessibilityEditorManifest} from '@ooopsstudio/accessibility/editor'
+import {accessibilityEditorManifest} from './preferences'
 import {
 	parseAccessibilityManifest,
 	parseComponentManifest,
@@ -46,7 +46,7 @@ const part = (
 	states: string[] = ['default']
 ): EditorPartManifest => ({
 	id,
-	selector: id === 'root' ? ':scope' : `[data-part="${id}"], [data-ooops-a11y-${id}], .ooops-a11y-${id}`,
+	selector: id === 'root' ? ':scope' : `[data-ooops-a11y-${id}], .ooops-a11y-${id}`,
 	states,
 	styleProperties: /label|title|eyebrow|value/.test(id) ? textStyles : surfaceStyles,
 	responsive: true,
@@ -67,17 +67,9 @@ const component = (
 		label,
 		category: 'accessibility',
 		owner: '@ooopsstudio/accessibility-astro',
-		insertable: true,
 		adapters: {astro: adapter, controller: '@ooopsstudio/accessibility'},
 		props,
-		slots: id === 'accessibility-menu' ? [
-			{id: 'trigger', label: 'Trigger content', editable: true},
-			{id: 'menu', label: 'Menu content', editable: true},
-			{id: 'header', label: 'Header content', editable: true},
-			{id: 'before-controls', label: 'Before controls', editable: true},
-			{id: 'after-controls', label: 'After controls', editable: true},
-			{id: 'footer', label: 'Footer content', editable: true}
-		] : [],
+		slots: [],
 		events: [],
 		parts: parts.map((partId) => part(id, partId, states)),
 		variants: []
@@ -123,20 +115,13 @@ export const accessibilityAstroComponentManifests = Object.freeze({
 		[
 			prop('enabled', 'Enabled', booleanSchema, {default: true, control: 'boolean'}),
 			prop('label', 'Label', stringSchema, {default: 'Accessibility', control: 'text'}),
-			prop('position', 'Position', enumSchema('bottom-left', 'bottom-right', 'top-left', 'top-right', 'inline'), {default: 'bottom-right', control: 'enum'}),
-			prop('locale', 'Locale', enumSchema('en', 'el'), {default: 'en', control: 'enum'}),
+			prop('position', 'Position', enumSchema('bottom-left', 'bottom-right'), {default: 'bottom-right', control: 'enum'}),
 			prop('storageKey', 'Storage key', stringSchema, {editable: false}),
 			prop('panelId', 'Panel ID', stringSchema, {editable: false}),
 			prop('includeBaseStyles', 'Base styles', booleanSchema, {default: true, control: 'boolean'}),
 			prop('includeGlobalEffects', 'Global effects', booleanSchema, {default: true, control: 'boolean'})
 		],
-		[
-			'root', 'trigger', 'trigger-label', 'trigger-icon', 'overlay', 'panel', 'header',
-			'header-content', 'header-actions', 'eyebrow', 'title', 'reset', 'close',
-			'close-icon', 'close-label', 'grid', 'item', 'card', 'toggle', 'icon-wrap',
-			'control-icon', 'toggle-label', 'range', 'control-title', 'range-controls',
-			'range-button', 'value'
-		],
+		['root', 'trigger', 'overlay', 'panel', 'header', 'eyebrow', 'title', 'close', 'grid', 'card', 'toggle', 'range', 'value', 'reset'],
 		['closed', 'open', 'active']
 	),
 	'skip-link': component(
@@ -146,7 +131,6 @@ export const accessibilityAstroComponentManifests = Object.freeze({
 		[
 			prop('href', 'Target', stringSchema, {default: '#main-content', control: 'text'}),
 			prop('label', 'Label', stringSchema, {default: 'Skip to content', control: 'text'}),
-			prop('locale', 'Locale', enumSchema('en', 'el'), {default: 'en', control: 'enum'}),
 			prop('includeBaseStyles', 'Base styles', booleanSchema, {default: true, control: 'boolean'})
 		],
 		['root', 'label'],

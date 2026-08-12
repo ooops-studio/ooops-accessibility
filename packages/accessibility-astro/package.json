@@ -13,10 +13,6 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./editor": {
-      "types": "./dist/editor.d.ts",
-      "import": "./dist/editor.js"
-    },
     "./AccessibilityHead.astro": {
       "default": "./dist/AccessibilityHead.astro"
     },
@@ -45,7 +41,6 @@
   },
   "dependencies": {
     "@ooopsstudio/accessibility": "workspace:^",
-    "@ooopsstudio/editor-contracts": "^0.1.0",
     "@ooopsstudio/ui-astro": "^0.1.0"
   },
   "peerDependencies": {

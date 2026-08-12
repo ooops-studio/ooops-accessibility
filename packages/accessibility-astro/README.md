@@ -138,9 +138,9 @@ The default classes are prefixed with `ooops-a11y-*`, follow the shared Ooops UI
 
 The `classNames` prop uses the shared `AccessibilityPartClasses` type. Atomic hooks include trigger/close labels and icons, header content/actions, items/cards, control titles, range buttons/values, icon wrappers, control icons, and toggle labels. Pass `includeBaseStyles={false}` when replacing the entire visual system.
 
-## Editor metadata
+## Optional editor metadata
 
-`@ooopsstudio/accessibility-astro/editor` exports v2 manifests for `AccessibilityHead`, `AccessibilityMenu` and `SkipLink`, plus the canonical preference manifest from the headless package.
+`@ooopsstudio/accessibility-editor-manifests` exports the visual-editor manifests for `AccessibilityHead`, `AccessibilityMenu` and `SkipLink`. The Astro adapter itself remains editor-independent.
 
 ## Development
 

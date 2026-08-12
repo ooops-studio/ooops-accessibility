@@ -1,15 +1,12 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest'
 
-import {accessibilityEditorManifest} from '../src/editor'
 import {
 	ACCESSIBILITY_RANGE_MAX,
 	ACCESSIBILITY_RANGE_MIN,
 	ACCESSIBILITY_MENU_PARTS,
 	ACCESSIBILITY_TOGGLE_ICONS,
 	ACCESSIBILITY_TRIGGER_ICON,
-	DEFAULT_ACCESSIBILITY_CONTROLS,
 	DEFAULT_ACCESSIBILITY_PREFERENCES,
-	DEFAULT_ACCESSIBILITY_STORAGE_KEY,
 	accessibilityGlobalStyles,
 	accessibilityMenuStyles,
 	applyAccessibilityPreferences,
@@ -59,23 +56,6 @@ beforeEach(() => {
 })
 
 describe('accessibility preferences', () => {
-	it('keeps editor metadata aligned with runtime preferences and effects', () => {
-		expect(accessibilityEditorManifest.schemaVersion).toBe(2)
-		expect(accessibilityEditorManifest.storageKey).toBe(DEFAULT_ACCESSIBILITY_STORAGE_KEY)
-		expect(accessibilityEditorManifest.preferences.map((entry) => entry.id)).toEqual(
-			DEFAULT_ACCESSIBILITY_CONTROLS.map((entry) => entry.key)
-		)
-		expect(accessibilityEditorManifest.preferences.find((entry) => entry.id === 'fontScale')).toMatchObject({
-			default: 100,
-			min: ACCESSIBILITY_RANGE_MIN,
-			max: ACCESSIBILITY_RANGE_MAX,
-			cssVariable: '--ooops-a11y-font-scale'
-		})
-		expect(accessibilityEditorManifest.preferences.find((entry) => entry.id === 'highContrast')).toMatchObject({
-			className: 'ooops-a11y-high-contrast'
-		})
-	})
-
 	it('loads defaults for missing or corrupt storage and clamps persisted ranges', () => {
 		expect(loadAccessibilityPreferences({storage: window.localStorage, storageKey})).toEqual(
 			DEFAULT_ACCESSIBILITY_PREFERENCES

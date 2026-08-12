@@ -1,0 +1,39 @@
+{
+  "name": "@ooopsstudio/accessibility-editor-manifests",
+  "version": "0.1.0",
+  "description": "Optional Ooops Editor manifests for accessibility preferences and Astro components.",
+  "type": "module",
+  "publishConfig": {"access": "public"},
+  "sideEffects": false,
+  "license": "MIT",
+  "engines": {"node": ">=22.14.0"},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ooops-studio/ooops-accessibility.git",
+    "directory": "packages/accessibility-editor-manifests"
+  },
+  "homepage": "https://github.com/ooops-studio/ooops-accessibility/tree/main/packages/accessibility-editor-manifests#readme",
+  "bugs": {"url": "https://github.com/ooops-studio/ooops-accessibility/issues"},
+  "exports": {
+    ".": {"types": "./dist/index.d.ts", "import": "./dist/index.js"},
+    "./components": {"types": "./dist/components.d.ts", "import": "./dist/components.js"},
+    "./preferences": {"types": "./dist/preferences.d.ts", "import": "./dist/preferences.js"}
+  },
+  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "dependencies": {
+    "@ooopsstudio/accessibility": "workspace:^",
+    "@ooopsstudio/editor-contracts": "^0.3.0"
+  },
+  "devDependencies": {
+    "@ooopsstudio/accessibility-astro": "workspace:^"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "size": "size-limit --config .size-limit.json",
+    "publint": "publint",
+    "attw": "attw --pack --ignore-rules no-resolution --ignore-rules cjs-resolves-to-esm",
+    "depcruise": "depcruise --config ../../.dependency-cruiser.cjs src"
+  }
+}
